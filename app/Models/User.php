@@ -49,12 +49,7 @@ class User extends Authenticatable
         ];
     }
 
-    protected static function booted()
-    {
-        static::creating(function ($product) {
-            $product->user_id = auth()->id();
-        });
-    }
+  
 
 
     public function products(): HasMany
