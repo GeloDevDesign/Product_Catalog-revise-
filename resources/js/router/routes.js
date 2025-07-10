@@ -5,6 +5,8 @@ import EditProductPage from "@/Pages/EditProductPage.vue";
 import ErrorPage from "@/Pages/ErrorPage.vue";
 import HomePage from "@/Pages/HomePage.vue";
 
+
+
 const routes = [
     {
         path: "/login",
@@ -47,5 +49,7 @@ const routes = [
         props: { errorStatus: 404 },
     },
 ];
+
+
 
 export default routes;

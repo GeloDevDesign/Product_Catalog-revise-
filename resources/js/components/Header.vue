@@ -18,7 +18,7 @@ const { authenticate,logout } = useAuthStore();
       <div class="dropdown dropdown-end">
         <div class="mr-2">
           <span class="text-sm opacity=75 text-white">Welcome Back! </span>
-          <span v-if="user?.name" class="text-sm font-semibold text-accent">{{ user.name }}</span>
+          <span v-if="user?.name" class="text-sm font-semibold text-accent">{{ user.name || 'No username' }}</span>
         </div>
       </div>
       <div class="dropdown dropdown-end">
