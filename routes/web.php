@@ -7,7 +7,7 @@ use App\Http\Controllers\CategoryController;
 
 Route::get('/categories', [CategoryController::class, 'index']);
 Route::get('/product/create', [ProductController::class, 'create'])->name('product.create');
-Route::post('/product', [ProductController::class, 'store2'])->name('product.store');
+Route::post('/product', [ProductController::class, 'store_laravel'])->name('product.store');
 
 Route::get('/{any}', function () {
     return view('app');

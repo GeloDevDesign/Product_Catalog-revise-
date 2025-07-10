@@ -18,6 +18,8 @@ class ProductController extends Controller
 
     public function create()
     {
+       
+
         $categories = Category::all();
         return view('product.create', compact('categories'));
     }
@@ -61,7 +63,7 @@ class ProductController extends Controller
         return response()->json($product->load('categories'), 200);
     }
 
-    public function store2(Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -84,26 +86,6 @@ class ProductController extends Controller
             'message' => 'Added Product Success',
             'data' => $product->load('categories'),
         ], 201);
-    }
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sell_price' => 'required|numeric|min:0',
-            'is_active' => 'required|boolean',
-            'category_ids' => 'required|array',
-            'category_ids.*' => 'exists:categories,id'
-        ]);
-
-        $product = Product::create([
-            'name' => $validated['name'],
-            'sell_price' => $validated['sell_price'],
-            'is_active' => $validated['is_active']
-        ]);
-
-        $product->categories()->sync($validated['category_ids']);
-
-        return redirect('/');
     }
 
     public function update(Request $request, Product $product)
