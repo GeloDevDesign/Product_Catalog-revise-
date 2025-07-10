@@ -30,7 +30,7 @@ onMounted(async () => {
       </div>
       <div class="flex gap-2">
         <FilterSearch />
-        <a onclick="window.location.href = '/product'" class="btn btn-primary">Laravel Page</a>
+        <a onclick="window.location.href = '/product/create'" class="btn btn-primary">Laravel Page</a>
 
         <RouterLink :to="{ name: 'add-product' }">
           <PrimaryButton buttonName="Add new product">

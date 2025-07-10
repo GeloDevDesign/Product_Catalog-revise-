@@ -16,6 +16,12 @@ use Illuminate\Support\Facades\Gate;
 class ProductController extends Controller
 {
 
+    public function create()
+    {
+        $categories = Category::all();
+        return view('product.create', compact('categories'));
+    }
+
     public function index(Request $request)
     {
         $query = Product::with('categories')
@@ -55,29 +61,49 @@ class ProductController extends Controller
         return response()->json($product->load('categories'), 200);
     }
 
+
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:100',
-            'sell_price' => 'required|numeric|min:1|gt:0',
-            'category_ids' => 'required|array'
+            'name' => 'required|string|max:255',
+            'sell_price' => 'required|numeric|min:0',
+            'is_active' => 'required|boolean',
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'exists:categories,id'
         ]);
 
-        $product = $request->user()->products()->create([
+        $product = Product::create([
             'name' => $validated['name'],
             'sell_price' => $validated['sell_price'],
+            'is_active' => $validated['is_active']
         ]);
 
+        $product->categories()->sync($validated['category_ids']);
+
+        return redirect()->route('home')->with('success', 'Product created successfully!');
+    }
 
 
-        if (!empty($validated['category_ids'])) {
-            $product->categories()->attach($validated['category_ids']);
-        }
+    public function store_laravel_part(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'sell_price' => 'required|numeric|min:0',
+            'is_active' => 'required|boolean',
+            'category_ids' => 'required|array',
+            'category_ids.*' => 'exists:categories,id'
+        ]);
 
-        return response()->json([
-            'message' => 'Added Product Success',
-            'data' => $product->load('categories'),
-        ], 201);
+        $product = Product::create([
+            'name' => $validated['name'],
+            'sell_price' => $validated['sell_price'],
+            'is_active' => $validated['is_active'],
+            'user_id' => 1
+        ]);
+
+        $product->categories()->sync($validated['category_ids']);
+
+        return redirect()->route('any');
     }
 
     public function update(Request $request, Product $product)
