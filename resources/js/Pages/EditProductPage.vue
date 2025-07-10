@@ -59,7 +59,7 @@ const toggleCategory = (categoryId) => {
 };
 
 onMounted(async () => {
-  await getCategories("/categories");
+  await getCategories("categories");
   await getItem(`products/${route.params.id}`);
   populateData(selectedItem.value);
 });

@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import api from "@/lib/axios"; 
 import { useModalAlert } from "@/composables/useModal";
 import router from "@/router";
 
@@ -11,38 +11,23 @@ export const useAuthStore = defineStore("authStore", {
         errors: {},
     }),
 
-    getters: {},
-
     actions: {
-        async getUser() {
-            try {
-                const response = await axios.get("/api/user");
-                this.user = response.data;
-            } catch (error) {
-                this.user = null;
-                modalAlert(
-                    "Error",
-                    "Session expired or not logged in.",
-                    "error"
-                );
-            }
-        },
-
+       
         async authenticate(apiRoute, formData) {
             this.errors = {};
 
             try {
-                await axios.get("/sanctum/csrf-cookie");
+                const response = await api.post(`/${apiRoute}`, formData);
 
-                const response = await axios.post(`/api/${apiRoute}`, formData);
+                const { user, token } = response.data;
 
-                this.user = response.data.user;
+                
+                localStorage.setItem("token", token);
+
+                this.user = user;
                 this.errors = {};
-                modalAlert(
-                    "Success",
-                    `Welcome ${response.data.user.name}`,
-                    "success"
-                );
+
+                modalAlert("Success", `Welcome ${user.name}`, "success");
                 router.push({ name: "home" });
             } catch (error) {
                 if (error.response?.status === 429) {
@@ -58,16 +43,32 @@ export const useAuthStore = defineStore("authStore", {
             }
         },
 
+      
         async logout() {
             try {
-               
-                await axios.post("/api/logout");
+                await api.post("/logout");
+
+              
+                localStorage.removeItem("token");
+
                 this.user = null;
                 this.errors = {};
+
                 modalAlert("Success", "Logged out successfully.", "success");
                 router.push({ name: "login" });
             } catch (error) {
                 modalAlert("Error", "An unexpected error occurred.", "error");
+            }
+        },
+
+       
+        async getUser() {
+            try {
+                const response = await api.get("/user");
+                this.user = response.data;
+            } catch (error) {
+                this.user = null;
+                localStorage.removeItem("token");
             }
         },
     },

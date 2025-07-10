@@ -7,11 +7,15 @@ import Inputfields from "@/components/Inputfields.vue";
 import Layout from "@/components/Layout.vue";
 
 import { storeToRefs } from "pinia";
+
 import { useCategoryStore } from "@/stores/category";
 import { useProductStore } from "@/stores/product";
 
+
+const categoryStore = useCategoryStore();
+const { data: categories } = storeToRefs(categoryStore);
 const { getCategories } = useCategoryStore();
-const { data } = storeToRefs(useCategoryStore());
+
 
 const { addProduct } = useProductStore();
 const { errors } = storeToRefs(useProductStore());
@@ -41,7 +45,7 @@ const toggleCategory = (categoryId) => {
 };
 
 onMounted(async () => {
-  await getCategories("/categories");
+  await getCategories("categories");
 });
 </script>
 
@@ -62,7 +66,7 @@ onMounted(async () => {
             Add New Product
           </h3>
 
-          <form @submit.prevent="addProduct('/products', productFormData)">
+          <form @submit.prevent="addProduct('products', productFormData)">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <h3 class="text-lg font-medium mb-2">Information</h3>
@@ -102,7 +106,7 @@ onMounted(async () => {
                   "
                 >
                   <div
-                    v-for="category in data"
+                    v-for="category in categories"
                     :key="category.id"
                     class="flex-shrink-0"
                   >

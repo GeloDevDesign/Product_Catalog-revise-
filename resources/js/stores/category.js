@@ -1,32 +1,26 @@
 import { defineStore } from "pinia";
+import api from "@/lib/axios"; 
 import { useModalAlert } from "@/composables/useModal";
+
 const { modalAlert } = useModalAlert();
 
 export const useCategoryStore = defineStore("categoryStore", {
-  state: () => {
-    return {
-      data: {},
-    };
-  },
-  getters: () => {},
-  actions: {
-    async getCategories(apiRoute) {
-      this.errors = {};
-      try {
-        const response = await fetch(`/api/${apiRoute}`, {
-          method: "GET",
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
+    state: () => ({
+        data: [],
+        errors: {},
+    }),
 
-        const data = await response.json();
-        this.data = data
-       
+    actions: {
+        async getCategories(apiRoute) {
+            this.errors = {};
 
-      } catch (error) {
-        modalAlert("Error", "An unexpected  while getting product data", "error");
-      }
+            try {
+                const { data } = await api.get(`/${apiRoute}`);
+                this.data = data || [];
+            } catch (error) {
+                this.errors = error.response?.data?.errors || {};
+                modalAlert("Error", "Failed to fetch categories.", "error");
+            }
+        },
     },
-  },
 });

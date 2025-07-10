@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import axios from "axios";
+import api from "@/lib/axios";   
 import { useModalAlert } from "@/composables/useModal";
 import { useToastAlert } from "@/composables/useToast";
 import Swal from "sweetalert2";
@@ -11,14 +11,12 @@ const { toastAlert } = useToastAlert();
 
 export const useProductStore = defineStore("productStore", {
   state: () => ({
-    data: {},
+    data: [],
     selectedItem: null,
     errors: {},
     pagination: null,
     loading: false,
   }),
-
-  getters: {},
 
   actions: {
     
@@ -27,58 +25,50 @@ export const useProductStore = defineStore("productStore", {
       this.errors = {};
 
       try {
-        const response = await axios.get(`/api/${apiRoute}`, {
-          params: {
-            page,
-            per_page: perPage,
-            search,
-            category_id: filter,
-          },
+        const { data } = await api.get(`/${apiRoute}`, {
+          params: { page, per_page: perPage, search, category_id: filter },
         });
 
-        this.data = response.data.data;
-        this.pagination = response.data;
-
+        this.data = data.data || [];
+        this.pagination = data;
       } catch (error) {
-        modalAlert("Error", "An unexpected error occurred while fetching products.", "error");
-        this.data = {};
+        this.data = [];
+        modalAlert("Error", "Failed to fetch products.", "error");
       } finally {
         this.loading = false;
       }
     },
 
-    
+  
     async getItem(apiRoute) {
       this.errors = {};
 
       try {
-        const response = await axios.get(`/api/${apiRoute}`);
-        this.selectedItem = response.data;
-
+        const { data } = await api.get(`/${apiRoute}`);
+        this.selectedItem = data;
       } catch (error) {
         router.push({
           name: "error",
           query: {
             status: error.response?.status || 500,
-            message: error.response?.data?.message || "An unexpected error occurred.",
+            message: error.response?.data?.message || "Unable to fetch product.",
           },
         });
       }
     },
 
-    
+   
     async addProduct(apiRoute, formData) {
       this.errors = {};
 
       try {
-        const response = await axios.post(`/api/${apiRoute}`, formData);
+        const { data } = await api.post(`/${apiRoute}`, formData);
 
-        toastAlert(response.data.message || "Product added successfully", "success");
-        this.router.push({ name: "home" });
-
+        toastAlert(data.message || "Product added successfully.", "success");
+        router.push({ name: "home" });
       } catch (error) {
         this.errors = error.response?.data?.errors || {};
-        toastAlert("Failed to add product", "error");
+        toastAlert("Failed to add product.", "error");
       }
     },
 
@@ -87,14 +77,13 @@ export const useProductStore = defineStore("productStore", {
       this.errors = {};
 
       try {
-        const response = await axios.patch(`/api/${apiRoute}`, formData);
+        const { data } = await api.patch(`/${apiRoute}`, formData);
 
-        toastAlert(response.data.message || "Product updated successfully", "success");
-        this.router.push({ name: "home" });
-
+        toastAlert(data.message || "Product updated successfully.", "success");
+        router.push({ name: "home" });
       } catch (error) {
         this.errors = error.response?.data?.errors || {};
-        toastAlert("Failed to update product", "error");
+        toastAlert("Failed to update product.", "error");
       }
     },
 
@@ -102,8 +91,8 @@ export const useProductStore = defineStore("productStore", {
     async deleteProduct(apiRoute, itemName) {
       this.errors = {};
 
-      const result = await Swal.fire({
-        title: `Are you sure you want to delete ${itemName}?`,
+      const { isConfirmed } = await Swal.fire({
+        title: `Delete ${itemName}?`,
         icon: "warning",
         showCancelButton: true,
         confirmButtonText: "Yes, Delete",
@@ -111,17 +100,16 @@ export const useProductStore = defineStore("productStore", {
         cancelButtonColor: "#3085d6",
       });
 
-      if (result.isConfirmed) {
-        try {
-          const response = await axios.delete(`/api/${apiRoute}`);
+      if (!isConfirmed) return;
 
-          toastAlert(response.data.message || "Product deleted successfully", "success");
-          this.router.push({ name: "home" });
+      try {
+        const { data } = await api.delete(`/${apiRoute}`);
 
-        } catch (error) {
-          this.errors = error.response?.data?.errors || {};
-          toastAlert("Failed to delete product", "error");
-        }
+        toastAlert(data.message || "Product deleted successfully.", "success");
+        router.push({ name: "home" });
+      } catch (error) {
+        this.errors = error.response?.data?.errors || {};
+        toastAlert("Failed to delete product.", "error");
       }
     },
   },
