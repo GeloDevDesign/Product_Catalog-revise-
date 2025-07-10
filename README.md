@@ -11,7 +11,7 @@ Dear Mr. Ryan,
 
 Good day!
 
-I am submitting my **Product Catalog** project as required.  
+I am submitting my **Product Catalog(revise)** project.  
 Here is the GitHub repository link:  
 👉 [https://github.com/your-username/Product_catalog](https://github.com/your-username/Product_catalog)
 
