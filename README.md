@@ -1,21 +1,12 @@
+# Product Catalog (Revise)
 
 ---
 
-### 📧 Email (with GitHub repo link)
+## 🔑 Default Account
 
-Subject: Product Catalog Project Submission
+After running the migration and seeder, a default account will be created automatically:
 
----
+- **Email:** test@example.com  
+- **Password:** Password1234
 
-Dear Mr. Ryan,
 
-Good day!
-
-I am submitting my **Product Catalog(revise)** project.  
-Here is the GitHub repository link:  
-👉 [https://github.com/your-username/Product_catalog](https://github.com/your-username/Product_catalog)
-
-### Setup Information:
-To set up the project, please run:
-```bash
-php artisan migrate:fresh --seed
