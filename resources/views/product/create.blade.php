@@ -62,11 +62,18 @@
                     <div>
                         <h3 class="text-lg font-medium mb-2">Categories</h3>
                         <div class="max-h-64 overflow-y-auto rounded-lg p-2 bg-white" id="categoriesContainer">
-                            <div class="text-center py-4">
-                                <span class="loading loading-spinner loading-md"></span>
-                                Loading categories...
-                            </div>
+                            @forelse ($categories as $category)
+                                <div class="flex-shrink-0">
+                                    <label class="flex items-center gap-2 px-2 py-1 hover:bg-blue-200 rounded">
+                                        <input type="checkbox" name="category_ids[]" value="{{ $category->id }}" class="checkbox checkbox-primary category-checkbox" />
+                                        <span class="whitespace-nowrap">{{ $category->name }}</span>
+                                    </label>
+                                </div>
+                            @empty
+                                <div class="text-red-500 p-2">No categories available.</div>
+                            @endforelse
                         </div>
+
                         <p id="categoriesError" class="text-red-600 opacity-70 mt-2 hidden"></p>
                     </div>
                 </div>
@@ -106,7 +113,7 @@ async function checkIfAuthenticated() {
         loadingScreen.classList.add('hidden');
         mainContent.classList.remove('hidden');
 
-        loadCategories();
+
         document.getElementById('productForm').addEventListener('submit', submitForm);
 
     } catch (error) {
@@ -117,35 +124,7 @@ async function checkIfAuthenticated() {
     }
 }
 
-async function loadCategories() {
-    try {
-        const response = await axios.get('/api/categories', {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
 
-        const container = document.getElementById('categoriesContainer');
-        container.innerHTML = '';
-
-        response.data.forEach(category => {
-            const categoryDiv = document.createElement('div');
-            categoryDiv.className = 'flex-shrink-0';
-            categoryDiv.innerHTML = `
-                <label class="flex items-center gap-2 px-2 py-1 hover:bg-blue-200 rounded">
-                    <input type="checkbox" name="category_ids[]" value="${category.id}" class="checkbox checkbox-primary category-checkbox" />
-                    <span class="whitespace-nowrap">${category.name}</span>
-                </label>
-            `;
-            container.appendChild(categoryDiv);
-        });
-    } catch (error) {
-      
-        document.getElementById('categoriesContainer').innerHTML = `
-            <div class="text-red-500 p-2">Failed to load categories. Please refresh the page.</div>
-        `;
-    }
-}
 
 async function submitForm(e) {
     e.preventDefault();
